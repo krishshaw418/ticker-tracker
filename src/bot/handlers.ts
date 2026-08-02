@@ -1,20 +1,25 @@
 import type { Context } from "grammy";
 import type { Conversation } from "@grammyjs/conversations";
+import { trackTicker } from "../services/trackTicker";
 
-export const assetDetails = async (
+export const trackAssetHandler = async (
   conversation: Conversation,
   ctx: Context,
 ) => {
   await ctx.reply(
-    "Please name the ticker you want to track.\nFor example: <b>ETH</b>, <b>SOL</b> etc.",
+    "Please name the base58 ticker mint you want to track.\nFor example: <b>9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump</b>.",
     {
       parse_mode: "HTML",
     },
   );
+
   const tickerCtx = await conversation.waitFor(":text", {
     otherwise: (ctx) => ctx.reply("Please enter a text message!"),
   });
-  await ctx.reply(`You entered: ${tickerCtx.msg.text}`);
+
+  const tickerMint = tickerCtx.msg.text;
+
+  await ctx.reply(`You entered: ${tickerMint}`);
 
   await ctx.reply(
     "Please enter the threshold price to trigger alert.\nFor example: <b>$2000</b>",
@@ -22,11 +27,34 @@ export const assetDetails = async (
       parse_mode: "HTML",
     },
   );
+
   const priceCtx = await conversation.waitFor(":text", {
     otherwise: (ctx) => ctx.reply("Please enter a text message!"),
   });
 
-  await ctx.reply(`You entered: ${priceCtx.msg.text}`);
+  try {
+    // typecast the string input to number. If it fails the conversation is halted with a response!
+    const threshold = Number(priceCtx.msg.text);
+
+    if (Number.isNaN(threshold)) {
+      throw new Error("Invalid price entered!");
+    }
+
+    await ctx.reply(`You entered: ${threshold}`);
+
+    // call trackTicker service
+    trackTicker(tickerMint, threshold);
+
+    await ctx.reply(
+      `Congratulations! Your Ticker is now being monitored.\n<b>Ticker Tracker</b> will send you alerts when your ticker cross $${threshold}.`,
+      { parse_mode: "HTML" },
+    );
+  } catch (err) {
+    console.error(err);
+    ctx.reply("Invalid price entered!\nTap /trackasset to try again.");
+    await conversation.halt();
+  }
+
   // Exiting the conversation
   await conversation.halt();
 };

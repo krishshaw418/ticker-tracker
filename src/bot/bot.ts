@@ -3,18 +3,27 @@ import {
   conversations,
   createConversation,
   type ConversationFlavor,
-  type Conversation,
 } from "@grammyjs/conversations";
-import { config } from "../config";
-import { assetDetails } from "./handlers";
+import { config } from "../lib/config";
+import { trackAssetHandler } from "./handlers";
 
 const bot = new Bot<ConversationFlavor<Context>>(config.botApiKey);
-bot.use(conversations()); // using the conversation middleware
-bot.use(createConversation(assetDetails)); // conversation builder
+bot.use(
+  conversations({
+    // log enter & exit events for conversations for debugging.
+    onEnter(convoName, ctx) {
+      console.log(`Entered convo id: ${convoName}`);
+    },
+    onExit(convoName, ctx) {
+      console.log(`Exit convo id: ${convoName}`);
+    },
+  }),
+); // using the conversation middleware
+bot.use(createConversation(trackAssetHandler, "assetDetails")); // conversation builder
 
 bot.command("start", async (ctx) => {
   await ctx.reply(
-    "<b>Welcome to Ticker-Tracker!</b>\nTrack your favourite asset on Solana by selecting the /trackasset",
+    "<b>Welcome to Ticker-Tracker!</b>\nTrack your favourite asset on Solana by selecting /trackasset cmd.",
     { parse_mode: "HTML" },
   );
 });
