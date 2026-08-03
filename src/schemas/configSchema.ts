@@ -4,5 +4,4 @@ export const configSchema = z.object({
   PORT: z.coerce.number(),
   TG_BOT_API_KEY: z.string(),
   JUPITER_API_KEY: z.string(),
-  BASE_URL: z.url()
 });

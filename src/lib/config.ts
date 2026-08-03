@@ -7,5 +7,4 @@ export const config = {
   port: envVariables.PORT,
   botApiKey: envVariables.TG_BOT_API_KEY,
   jupApiKey: envVariables.JUPITER_API_KEY,
-  baseUrl: envVariables.BASE_URL,
 };
