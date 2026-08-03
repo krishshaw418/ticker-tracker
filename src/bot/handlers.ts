@@ -7,7 +7,7 @@ export const trackAssetHandler = async (
   ctx: Context,
 ) => {
   await ctx.reply(
-    "Please name the base58 ticker mint you want to track.\nFor example: <b>9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump</b>.",
+    "Please name the base58 ticker mint you want to track.\nFor example: <b>9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump</b>",
     {
       parse_mode: "HTML",
     },
@@ -22,7 +22,7 @@ export const trackAssetHandler = async (
   await ctx.reply(`You entered: ${tickerMint}`);
 
   await ctx.reply(
-    "Please enter the threshold price to trigger alert.\nFor example: <b>$2000</b>",
+    "Please enter the threshold price(in USD) to trigger alert.\nFor example: <b>0.25</b>",
     {
       parse_mode: "HTML",
     },
@@ -43,7 +43,7 @@ export const trackAssetHandler = async (
     await ctx.reply(`You entered: ${threshold}`);
 
     // call trackTicker service
-    trackTicker(tickerMint, threshold);
+    trackTicker(ctx.from?.id as number, tickerMint, threshold);
 
     await ctx.reply(
       `Congratulations! Your Ticker is now being monitored.\n<b>Ticker Tracker</b> will send you alerts when your ticker cross $${threshold}.`,
