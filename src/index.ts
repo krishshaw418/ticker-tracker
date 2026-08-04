@@ -2,7 +2,7 @@ import { createServer } from "./lib/server";
 import bot from "./bot/bot";
 import { config } from "./lib/config";
 
-async function main() {
+async function main(): Promise<void> {
   const app = await createServer();
   const PORT = config.port;
 

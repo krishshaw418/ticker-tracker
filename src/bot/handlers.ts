@@ -5,7 +5,7 @@ import { trackTicker } from "../services/trackTicker";
 export const trackAssetHandler = async (
   conversation: Conversation,
   ctx: Context,
-) => {
+): Promise<void> => {
   await ctx.reply(
     "Please name the base58 ticker mint you want to track.\nFor example: <b>9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump</b>",
     {

@@ -1,17 +1,26 @@
+import { config } from "./config";
 import pg from "pg";
 const { Pool } = pg;
 
+interface Request {
+  userId: number;
+  tickerMint: string;
+  threshold: number;
+}
+
 class PgClient {
-  private static pool = new Pool();
+  private static pool = new Pool({
+    connectionString: config.pgConnectionString,
+    max: 20, // max allowed client in the pool
+    idleTimeoutMillis: 30000, // minimum time the client can sit idle in the pool before getting disconnected from the backend & discarded
+    connectionTimeoutMillis: 2000, // minimum time before timing out the client connection
+  });
 
   public async init(): Promise<void> {
     try {
-      // enable the pgcrypto extension for using gen_random_uuid
-      await PgClient.pool.query("CREATE EXTENSION IF NOT EXISTS pgcrypto");
-
       // create request table
       const createTable =
-        "CREATE TABLE IF NOT EXISTS request (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), userId BIGINT NOT NULL, tickerMint TEXT CHECK (tickerMint ~ '^[1-9A-HJ-NP-Za-km-z]{32,44}$'), threshold NUMERIC NOT NULL)";
+        "CREATE TABLE IF NOT EXISTS request (userId BIGINT NOT NULL, tickerMint TEXT CHECK (tickerMint ~ '^[1-9A-HJ-NP-Za-km-z]{32,44}$'), threshold NUMERIC NOT NULL, UNIQUE(userId, tickerMint))";
       await PgClient.pool.query(createTable);
     } catch (err) {
       throw err;
@@ -25,36 +34,44 @@ class PgClient {
   ): Promise<string> {
     try {
       const insertQuery =
-        "INSERT INTO request (userId, tickerMint, threshold) VALUES ($1, $2, $3) RETURNING id";
+        "INSERT INTO request (userId, tickerMint, threshold) VALUES ($1, $2, $3) RETURNING userId, tickerMint";
       const res = await PgClient.pool.query(insertQuery, [
         userId,
         tickerMint,
         threshold,
       ]);
       console.log(`New request saved at row: \n`, res.rows[0]);
-      return res.rows[0].id;
+      return res.rows[0];
     } catch (err) {
       throw err;
     }
   }
 
-  public async readRequest(requestId: string): Promise<any | null> {
+  public async readRequest(
+    userId: number,
+    tickerMint: string,
+  ): Promise<Request> {
     try {
-      const readQuery = "SELECT * FROM request WHERE id = $1";
+      const readQuery =
+        "SELECT * FROM request WHERE userId = $1 AND tickerMint = $2";
 
-      const res = await PgClient.pool.query(readQuery, [requestId]);
+      const res = await PgClient.pool.query(readQuery, [userId, tickerMint]);
       console.log(`Fetched request: \n`, res.rows[0]);
-      return res.rows[0] ?? null;
+      return res.rows[0];
     } catch (err) {
       throw err;
     }
   }
 
-  public async deleteRequest(requestId: string): Promise<boolean> {
+  public async deleteRequest(
+    userId: number,
+    tickerMint: string,
+  ): Promise<boolean> {
     try {
-      const deleteQuery = "DELETE FROM request WHERE id = $1";
+      const deleteQuery =
+        "DELETE FROM request WHERE userId = $1 AND tickerMint = $2";
 
-      const res = await PgClient.pool.query(deleteQuery, [requestId]);
+      const res = await PgClient.pool.query(deleteQuery, [userId, tickerMint]);
       console.log(`Deleted row: ${res.rowCount}`);
       return res.rowCount === 1;
     } catch (err) {

@@ -23,7 +23,7 @@ export class Tracker {
 
         // calculate price in USDC
         const currPrice = Number(data.outAmount) / 10 ** 6 / (Number(data.inAmount) / 10 ** 6);
-        await comparator(userId, currPrice);
+        await comparator(userId, tickerMint, currPrice);
 
         console.log(`$${currPrice}`);
       } catch (err) {
