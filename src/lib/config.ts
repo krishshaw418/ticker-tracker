@@ -8,4 +8,5 @@ export const config = {
   botApiKey: envVariables.TG_BOT_API_KEY,
   jupApiKey: envVariables.JUPITER_API_KEY,
   pgConnectionString: envVariables.PG_CONNECTION_STRING,
+  redisConnectionString: envVariables.REDIS_CONNECTION_STRING,
 };

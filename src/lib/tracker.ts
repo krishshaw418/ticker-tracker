@@ -1,8 +1,11 @@
 import { config } from "./config";
 import { comparator } from "../utils/comparator";
 
-export class Tracker {
-  private static pollIntervals: Map<string, NodeJS.Timeout> = new Map<string, NodeJS.Timeout>();
+class Tracker {
+  private static pollIntervals: Map<string, NodeJS.Timeout> = new Map<
+    string,
+    NodeJS.Timeout
+  >();
 
   public startPolling(userId: number, tickerMint: string): void {
     const pollInterval = setInterval(async () => {
@@ -22,7 +25,8 @@ export class Tracker {
         const data = await response.json();
 
         // calculate price in USDC
-        const currPrice = Number(data.outAmount) / 10 ** 6 / (Number(data.inAmount) / 10 ** 6);
+        const currPrice =
+          Number(data.outAmount) / 10 ** 6 / (Number(data.inAmount) / 10 ** 6);
         await comparator(userId, tickerMint, currPrice);
 
         console.log(`$${currPrice}`);
@@ -41,3 +45,6 @@ export class Tracker {
     Tracker.pollIntervals.delete(tickerMint);
   }
 }
+
+const tracker = new Tracker();
+export { tracker };

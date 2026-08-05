@@ -5,4 +5,5 @@ export const configSchema = z.object({
   TG_BOT_API_KEY: z.string(),
   JUPITER_API_KEY: z.string(),
   PG_CONNECTION_STRING: z.string(),
+  REDIS_CONNECTION_STRING: z.string(),
 });

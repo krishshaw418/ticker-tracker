@@ -8,7 +8,7 @@ interface Request {
   threshold: number;
 }
 
-class PgClient {
+class Db {
   private static pool = new Pool({
     connectionString: config.pgConnectionString,
     max: 20, // max allowed client in the pool
@@ -21,7 +21,7 @@ class PgClient {
       // create request table
       const createTable =
         "CREATE TABLE IF NOT EXISTS request (userId BIGINT NOT NULL, tickerMint TEXT CHECK (tickerMint ~ '^[1-9A-HJ-NP-Za-km-z]{32,44}$'), threshold NUMERIC NOT NULL, UNIQUE(userId, tickerMint))";
-      await PgClient.pool.query(createTable);
+      await Db.pool.query(createTable);
     } catch (err) {
       throw err;
     }
@@ -35,7 +35,7 @@ class PgClient {
     try {
       const insertQuery =
         "INSERT INTO request (userId, tickerMint, threshold) VALUES ($1, $2, $3) RETURNING userId, tickerMint";
-      const res = await PgClient.pool.query(insertQuery, [
+      const res = await Db.pool.query(insertQuery, [
         userId,
         tickerMint,
         threshold,
@@ -55,7 +55,7 @@ class PgClient {
       const readQuery =
         "SELECT * FROM request WHERE userId = $1 AND tickerMint = $2";
 
-      const res = await PgClient.pool.query(readQuery, [userId, tickerMint]);
+      const res = await Db.pool.query(readQuery, [userId, tickerMint]);
       console.log(`Fetched request: \n`, res.rows[0]);
       return res.rows[0];
     } catch (err) {
@@ -71,7 +71,7 @@ class PgClient {
       const deleteQuery =
         "DELETE FROM request WHERE userId = $1 AND tickerMint = $2";
 
-      const res = await PgClient.pool.query(deleteQuery, [userId, tickerMint]);
+      const res = await Db.pool.query(deleteQuery, [userId, tickerMint]);
       console.log(`Deleted row: ${res.rowCount}`);
       return res.rowCount === 1;
     } catch (err) {
@@ -80,7 +80,7 @@ class PgClient {
   }
 }
 
-const pgClient = new PgClient();
-await pgClient.init();
+const db = new Db();
+await db.init();
 
-export { pgClient };
+export { db };

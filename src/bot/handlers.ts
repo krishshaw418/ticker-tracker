@@ -37,7 +37,9 @@ export const trackAssetHandler = async (
     const threshold = Number(priceCtx.msg.text);
 
     if (Number.isNaN(threshold)) {
-      throw new Error("Invalid price entered!");
+      throw new Error("Parsing Error", {
+        cause: "Invalid price entered!",
+      });
     }
 
     await ctx.reply(`You entered: ${threshold}`);
@@ -51,7 +53,14 @@ export const trackAssetHandler = async (
     );
   } catch (err) {
     console.error(err);
-    ctx.reply("Invalid price entered!\nTap /trackasset to try again.");
+    if (err instanceof Error && err.name === "Parsing Error") {
+      ctx.reply("Invalid price entered!\nTap /trackasset to try again.");
+    }
+    if (err instanceof Error && err.name === "DB Error") {
+      ctx.reply(
+        "Something went wrong on our end!\nPlease try again after sometime.",
+      );
+    }
     await conversation.halt();
   }
 

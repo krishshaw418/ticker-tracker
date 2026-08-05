@@ -1,6 +1,7 @@
 import bot from "../bot/bot";
-import { Tracker } from "../lib/tracker";
-import { pgClient } from "../lib/db";
+import { tracker } from "../lib/tracker";
+import { db } from "../lib/db";
+import { redis } from "../lib/redis";
 
 export const comparator = async (
   userId: number,
@@ -8,9 +9,18 @@ export const comparator = async (
   currPrice: number,
 ): Promise<void> => {
   try {
-    // Threshold will be fetched from the db/cache
-    const request = await pgClient.readRequest(userId, tickerMint);
-    const threshold = request.threshold;
+    // check cache before reading db
+    let threshold = await redis.readCachedRequest(userId, tickerMint);
+    // if request not found in cache then read db and cache it
+    if (threshold === null || threshold === undefined) {
+      const request = await db.readRequest(userId, tickerMint);
+      await redis.cacheRequest(
+        request.userId,
+        request.tickerMint,
+        request.threshold,
+      );
+      threshold = request.threshold;
+    }
 
     if (currPrice >= threshold) {
       await bot.api.sendMessage(
@@ -21,9 +31,12 @@ export const comparator = async (
         },
       );
 
-      const tracker = new Tracker();
       tracker.stopPolling(tickerMint);
-      await pgClient.deleteRequest(userId, tickerMint);
+      await db.deleteRequest(userId, tickerMint);
+      await redis.clearCachedRequest(userId, tickerMint);
     }
-  } catch (err) {}
+  } catch (err) {
+    console.error(err);
+    return;
+  }
 };
