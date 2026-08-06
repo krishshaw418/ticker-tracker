@@ -25,8 +25,7 @@ class Tracker {
         const data = await response.json();
 
         // calculate price in USDC
-        const currPrice =
-          Number(data.outAmount) / 10 ** 6 / (Number(data.inAmount) / 10 ** 6);
+        const currPrice = (Number(data.outAmount) / 10 ** 6) / (Number(data.inAmount) / 10 ** 6);
         await comparator(userId, tickerMint, currPrice);
 
         console.log(`$${currPrice}`);

@@ -8,6 +8,10 @@ class Cache {
     },
   );
 
+  public async init() {
+    await Cache.redisClient.connect();
+  }
+
   public async cacheRequest(
     userId: number,
     tickerMint: string,
@@ -58,4 +62,5 @@ class Cache {
 }
 
 const redis = new Cache();
+await redis.init();
 export { redis };
