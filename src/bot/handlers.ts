@@ -21,7 +21,7 @@ export const trackAssetHandler = async (
 
     const tickerMint = tickerCtx.msg.text;
     // check for address validity
-    await tickerInfo.checkAddress(tickerMint);
+    await conversation.external(() => tickerInfo.checkAddress(tickerMint));
 
     await ctx.reply(`You entered: ${tickerMint}`);
 
@@ -48,7 +48,9 @@ export const trackAssetHandler = async (
     await ctx.reply(`You entered: ${threshold}`);
 
     // call trackTicker service
-    trackTicker(ctx.from?.id as number, tickerMint, threshold);
+    await conversation.external(() =>
+      trackTicker(ctx.from?.id as number, tickerMint, threshold),
+    );
 
     await ctx.reply(
       `Congratulations! Your Ticker is now being monitored.\n<b>Ticker Tracker</b> will send you alerts when your ticker cross $${threshold}.`,

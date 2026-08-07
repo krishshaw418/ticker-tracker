@@ -21,7 +21,7 @@ class TickerInfo {
         tickerMint as Address,
       );
       if (mintAccount.data.isInitialized) {
-        await redis.cacheDecimals(tickerMint, mintAccount.data.decimals);
+        await redis.storeDecimals(tickerMint, mintAccount.data.decimals);
         return;
       }
 
@@ -30,7 +30,7 @@ class TickerInfo {
         tickerMint as Address,
       );
       if (mint2022Accout.data.isInitialized) {
-        await redis.cacheDecimals(tickerMint, mintAccount.data.decimals);
+        await redis.storeDecimals(tickerMint, mintAccount.data.decimals);
         return;
       }
     } catch (err) {

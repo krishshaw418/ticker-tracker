@@ -10,10 +10,18 @@ class Tracker {
 
   public async startPolling(userId: number, tickerMint: string): Promise<void> {
     try {
-      const decimals = await redis.readCachedDecimals(tickerMint);
-      if (!decimals) {
-        throw new Error("Failed to read decimals!");
+      // Important note:
+      // Since the decimals reading is outside the pollInterval it's only need fetched once from redis.
+      // So, the stored decimal only needs to be saved for until pollInterval below is called,
+      // hence just store the value in 'decimals' varaible and clear the key in redis.
+      const decimals = await redis.readDecimals(tickerMint);
+      await redis.clearDecimals(tickerMint);
+
+      console.log(decimals);
+      if (decimals === null || decimals === undefined) {
+        throw new Error("[Redis Error]: Failed to read decimals!");
       }
+
       const pollInterval = setInterval(async () => {
         try {
           // fetch quote
@@ -32,8 +40,8 @@ class Tracker {
 
           // calculate price in USDC
           const currPrice =
-            Number(data.outAmount) /
-            10 ** 6 /
+            (Number(data.outAmount) /
+            10 ** 6) /
             (Number(data.inAmount) / 10 ** decimals);
           await comparator(userId, tickerMint, currPrice);
 

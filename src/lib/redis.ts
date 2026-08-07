@@ -34,12 +34,12 @@ class Cache {
     }
   }
 
-  public async cacheDecimals(
+  public async storeDecimals(
     tickerMint: string,
     decimals: number,
   ): Promise<void> {
     try {
-      // set the key only if it does not already exists
+      // set the key only if it does not already exists and set 2 mins expiry
       await Cache.redisClient.set(tickerMint, decimals, {
         condition: "NX",
       });
@@ -49,7 +49,7 @@ class Cache {
     }
   }
 
-  public async readCachedDecimals(
+  public async readDecimals(
     tickerMint: string,
   ): Promise<number | null | undefined> {
     try {
@@ -59,6 +59,16 @@ class Cache {
       } else {
         return null;
       }
+    } catch (err) {
+      console.error("[Redis Error]: ", err);
+      return;
+    }
+  }
+
+  public async clearDecimals(tickerMint: string): Promise<void> {
+    try {
+      const res = await Cache.redisClient.del(tickerMint);
+      console.log("Cleared Decimals: ", res);
     } catch (err) {
       console.error("[Redis Error]: ", err);
       return;
