@@ -15,8 +15,8 @@ export const comparator = async (
     if (threshold === null || threshold === undefined) {
       const request = await db.readRequest(userId, tickerMint);
       await redis.cacheRequest(
-        request.userId,
-        request.tickerMint,
+        request.userid,
+        request.tickermint,
         request.threshold,
       );
       threshold = request.threshold;

@@ -32,6 +32,13 @@ bot.command("trackasset", async (ctx) => {
   await ctx.conversation.enter("assetDetails");
 });
 
+bot.command("help", async (ctx) => {
+  await ctx.reply(
+    "<b>Available Options</b>:\n/start - Introduction\n/trackasset - Track a ticker on Solana",
+    { parse_mode: "HTML" },
+  );
+})
+
 bot.catch((err) => {
   const ctx = err.ctx;
   console.error(`Error while handling update: ${ctx.update.update_id}: `);

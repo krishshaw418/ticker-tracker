@@ -3,8 +3,8 @@ import pg from "pg";
 const { Pool } = pg;
 
 interface Request {
-  userId: number;
-  tickerMint: string;
+  userid: number;
+  tickermint: string;
   threshold: number;
 }
 
@@ -56,7 +56,7 @@ class Db {
         "SELECT * FROM request WHERE userId = $1 AND tickerMint = $2";
 
       const res = await Db.pool.query(readQuery, [userId, tickerMint]);
-      console.log(`Fetched request: \n`, res.rows[0]);
+      // console.log(`Fetched request: \n`, res.rows[0]);
       return res.rows[0];
     } catch (err) {
       throw err;

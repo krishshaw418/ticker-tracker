@@ -53,10 +53,10 @@ export const trackAssetHandler = async (
     );
   } catch (err) {
     console.error(err);
-    if (err instanceof Error && err.name === "Parsing Error") {
+    if (err instanceof Error && err.message === "Parsing Error") {
       ctx.reply("Invalid price entered!\nTap /trackasset to try again.");
     }
-    if (err instanceof Error && err.name === "DB Error") {
+    if (err instanceof Error && err.message === "DB Error") {
       ctx.reply(
         "Something went wrong on our end!\nPlease try again after sometime.",
       );
