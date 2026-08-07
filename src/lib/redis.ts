@@ -15,17 +15,50 @@ class Cache {
         },
       },
     },
-  ).on("error", (err) => {
-    console.log("[Redis Error]: ", err);
-    return;
-  }).on("end", (err) => {
-    console.log("[Redis Error]: ", err);
-    return;
-  });
+  )
+    .on("error", (err) => {
+      console.log("[Redis Error]: ", err);
+      return;
+    })
+    .on("end", (err) => {
+      console.log("[Redis Error]: ", err);
+      return;
+    });
 
   public async init() {
     try {
       await Cache.redisClient.connect();
+    } catch (err) {
+      console.error("[Redis Error]: ", err);
+      return;
+    }
+  }
+
+  public async cacheDecimals(
+    tickerMint: string,
+    decimals: number,
+  ): Promise<void> {
+    try {
+      // set the key only if it does not already exists
+      await Cache.redisClient.set(tickerMint, decimals, {
+        condition: "NX",
+      });
+    } catch (err) {
+      console.error("[Redis Error]: ", err);
+      return;
+    }
+  }
+
+  public async readCachedDecimals(
+    tickerMint: string,
+  ): Promise<number | null | undefined> {
+    try {
+      const decimals = await Cache.redisClient.get(tickerMint);
+      if (decimals) {
+        return Number(decimals);
+      } else {
+        return null;
+      }
     } catch (err) {
       console.error("[Redis Error]: ", err);
       return;
