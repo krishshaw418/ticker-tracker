@@ -78,6 +78,18 @@ class Db {
       throw err;
     }
   }
+
+  public async readAllRequest(): Promise<Array<Request>> {
+    try {
+      const readAllReqQuery = "SELECT * FROM request";
+      const res = await Db.pool.query(readAllReqQuery);
+      console.log(res.rows);
+
+      return res.rows;
+    } catch (err) {
+      throw err;
+    }
+  }
 }
 
 const db = new Db();
