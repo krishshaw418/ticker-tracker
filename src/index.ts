@@ -13,6 +13,9 @@ async function main(): Promise<void> {
   app.listen(PORT, () => {
     console.log(`Listening on port: ${PORT}...`);
   });
+
+  // For dev mode
+  // bot.start();
 }
 
 main().catch((err) => {

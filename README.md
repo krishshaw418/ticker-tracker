@@ -60,6 +60,7 @@ When the target price is reached or crossed, the bot sends an alert to the user.
 - Telegram Bot Token
 - RPC url
 - Jupiter api token
+- A selfhosted VPS url
 
 ### Installation
 
@@ -90,6 +91,8 @@ Development:
 ```bash
 npm run dev
 ```
+
+Note: For development use `bot.start()` in `index.ts` inplace of `webhookCallback` & `setWebhook` in `server.ts`
 
 Production:
 

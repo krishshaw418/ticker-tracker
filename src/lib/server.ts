@@ -11,9 +11,10 @@ export const createServer = async (): Promise<Express> => {
     return res.status(200).json({ message: "ok" });
   });
 
+  // For produnction
   // attach the bot as a middleware
   app.use(webhookCallback(bot, "express"));
-
   await bot.api.setWebhook(config.webhookUrl);
+  
   return app;
 };
