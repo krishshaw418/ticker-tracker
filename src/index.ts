@@ -1,5 +1,4 @@
 import { createServer } from "./lib/server.js";
-import bot from "./bot/bot.js";
 import { config } from "./lib/config.js";
 import { trackReboot } from "./services/trackReboot.js";
 
@@ -14,9 +13,6 @@ async function main(): Promise<void> {
   app.listen(PORT, () => {
     console.log(`Listening on port: ${PORT}...`);
   });
-
-  // start the bot
-  bot.start();
 }
 
 main().catch((err) => {

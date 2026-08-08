@@ -6,5 +6,6 @@ export const configSchema = z.object({
   JUPITER_API_KEY: z.string(),
   PG_CONNECTION_STRING: z.string(),
   REDIS_CONNECTION_STRING: z.string(),
-  HELIUS_RPC_URL: z.string()
+  HELIUS_RPC_URL: z.url(),
+  SERVER_WEBHOOK_URL: z.url(),
 });

@@ -1,6 +1,7 @@
 import { config } from "./config.js";
 import { comparator } from "../utils/comparator.js";
 import { redis } from "./redis.js";
+import { USDC_MINT } from "../utils/constants.js";
 
 class Tracker {
   private static pollIntervals: Map<string, NodeJS.Timeout> = new Map<
@@ -27,7 +28,7 @@ class Tracker {
           // fetch quote
           const JUP_BASE_URL = "https://api.jup.ag/swap/v2/order";
           const response = await fetch(
-            `${JUP_BASE_URL}?inputMint=${tickerMint}&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=1000000`,
+            `${JUP_BASE_URL}?inputMint=${tickerMint}&outputMint=${USDC_MINT}&amount=1000000`,
             {
               method: "GET",
               headers: {

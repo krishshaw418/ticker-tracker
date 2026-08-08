@@ -58,6 +58,14 @@ export const trackAssetHandler = async (
     );
   } catch (err) {
     console.error(err);
+
+    if (err instanceof Error && err.message === "USDC Mint") {
+      ctx.reply(
+        "<b>Can't track price of USDC in USDC!</b>\nPlease check the address and retry.",
+        { parse_mode: "HTML" },
+      );
+    }
+
     if (err instanceof Error && err.message === "Invalid Mint") {
       ctx.reply(
         "<b>Invalid mint address!</b>\nPlease check the address and retry.",

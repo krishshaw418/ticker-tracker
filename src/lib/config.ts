@@ -10,4 +10,5 @@ export const config = {
   pgConnectionString: envVariables.PG_CONNECTION_STRING,
   redisConnectionString: envVariables.REDIS_CONNECTION_STRING,
   heliusRpcUrl: envVariables.HELIUS_RPC_URL,
+  webhookUrl: envVariables.SERVER_WEBHOOK_URL,
 };

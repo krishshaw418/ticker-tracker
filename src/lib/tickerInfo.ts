@@ -4,12 +4,20 @@ import { fetchMint as fetchMint2022 } from "@solana-program/token-2022";
 import { config } from "./config.js";
 import { redis } from "./redis.js";
 import { SolanaError } from "@solana/kit";
+import { USDC_MINT } from "../utils/constants.js";
 
 class TickerInfo {
   private static rpc = createSolanaRpc(config.heliusRpcUrl);
 
   public async checkAddress(tickerMint: string): Promise<void> {
     try {
+
+      if (tickerMint === USDC_MINT) {
+        throw new Error("USDC Mint", {
+          cause: "Ticker mint cannot be USDC!"
+        })
+      }
+
       if (!isAddress(tickerMint)) {
         throw new Error("Invalid Mint", {
           cause: "Invalid address format!",
