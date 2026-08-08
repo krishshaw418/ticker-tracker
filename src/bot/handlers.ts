@@ -20,7 +20,8 @@ export const trackAssetHandler = async (
     });
 
     const tickerMint = tickerCtx.msg.text;
-    // check for address validity
+
+    // check for address validity & store decimals
     await conversation.external(() => tickerInfo.checkAddress(tickerMint));
 
     await ctx.reply(`You entered: ${tickerMint}`);

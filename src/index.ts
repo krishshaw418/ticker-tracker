@@ -1,10 +1,11 @@
 import { createServer } from "./lib/server.js";
-import { config } from "./lib/config.js";
+import { envConfig } from "./lib/config.js";
 import { trackReboot } from "./services/trackReboot.js";
+import { bot } from "./bot/bot.js";
 
 async function main(): Promise<void> {
   const app = await createServer();
-  const PORT = config.port;
+  const PORT = envConfig.port;
 
   // first restart tracking for pending requests
   await trackReboot();
@@ -15,7 +16,7 @@ async function main(): Promise<void> {
   });
 
   // For dev mode
-  // bot.start();
+  bot.start();
 }
 
 main().catch((err) => {

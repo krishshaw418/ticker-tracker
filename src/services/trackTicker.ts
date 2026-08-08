@@ -7,13 +7,12 @@ export const trackTicker = async (
   tickerMint: string,
   threshold: number,
 ): Promise<void> => {
-  // log the request
-  console.log(
-    `userId: ${userId}\ttickerMint: ${tickerMint}\tthreshold: $${threshold}`,
-  );
   try {
+    // save into db
     await db.insertNewRequest(userId, tickerMint, threshold);
+    // start tracking
     tracker.startPolling(userId, tickerMint);
+    // cache request to redis
     await redis.cacheRequest(userId, tickerMint, threshold);
   } catch (err) {
     throw new Error("DB Error", {

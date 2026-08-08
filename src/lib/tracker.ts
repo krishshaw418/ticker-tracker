@@ -1,13 +1,12 @@
-import { config } from "./config.js";
+import { envConfig } from "./config.js";
 import { comparator } from "../utils/comparator.js";
 import { redis } from "./redis.js";
 import { USDC_MINT } from "../utils/constants.js";
+import { type JupResponse } from "../types/types.js";
 
 class Tracker {
-  private static pollIntervals: Map<string, NodeJS.Timeout> = new Map<
-    string,
-    NodeJS.Timeout
-  >();
+  private static userRequests: Map<number, Map<string, NodeJS.Timeout>> =
+    new Map<number, Map<string, NodeJS.Timeout>>(); // an in-memory map for storing userRequests of each userRequests per user
 
   public async startPolling(userId: number, tickerMint: string): Promise<void> {
     try {
@@ -18,7 +17,6 @@ class Tracker {
       const decimals = await redis.readDecimals(tickerMint);
       await redis.clearDecimals(tickerMint);
 
-      console.log(decimals);
       if (decimals === null || decimals === undefined) {
         throw new Error("[Redis Error]: Failed to read decimals!");
       }
@@ -32,15 +30,12 @@ class Tracker {
             {
               method: "GET",
               headers: {
-                "x-api-key": config.jupApiKey,
+                "x-api-key": envConfig.jupApiKey,
               },
             },
           );
 
-          const data = (await response.json()) as {
-            inAmount: number;
-            outAmount: number;
-          };
+          const data = (await response.json()) as JupResponse;
 
           // calculate price in USDC
           const currPrice =
@@ -49,24 +44,42 @@ class Tracker {
             (Number(data.inAmount) / 10 ** decimals);
           await comparator(userId, tickerMint, currPrice);
 
-          console.log(`$${currPrice}`);
+          console.log(`${tickerMint}: $${currPrice}`);
         } catch (err) {
           console.error(err);
           return;
         }
       }, 30000);
 
-      Tracker.pollIntervals.set(tickerMint, pollInterval);
+      const userReqList = Tracker.userRequests.get(userId);
+
+      if (userReqList !== undefined) {
+        userReqList.set(tickerMint, pollInterval);
+        console.log(`User-${userId} has ${userReqList.size} requests`);
+      } else {
+        const newReqList = new Map<string, NodeJS.Timeout>().set(
+          tickerMint,
+          pollInterval,
+        );
+        Tracker.userRequests.set(userId, newReqList);
+      }
     } catch (err) {
       console.error(err);
       return;
     }
   }
 
-  public stopPolling(tickerMint: string) {
-    // console.log(typeof Tracker.pollIntervals.get(tickerMint));
-    clearInterval(Tracker.pollIntervals.get(tickerMint));
-    Tracker.pollIntervals.delete(tickerMint);
+  public stopPolling(userId: number, tickerMint: string): void {
+    const userReqList = Tracker.userRequests.get(userId);
+    if (userReqList !== undefined) {
+      clearInterval(userReqList.get(tickerMint));
+      userReqList.delete(tickerMint);
+
+      if (userReqList.size == 0) {
+        Tracker.userRequests.delete(userId);
+      }
+    }
+    console.log("Number of req lists: ", Tracker.userRequests.size);
   }
 }
 

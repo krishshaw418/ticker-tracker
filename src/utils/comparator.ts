@@ -1,4 +1,4 @@
-import bot from "../bot/bot.js";
+import { bot } from "../bot/bot.js";
 import { tracker } from "../lib/tracker.js";
 import { db } from "../lib/db.js";
 import { redis } from "../lib/redis.js";
@@ -31,7 +31,7 @@ export const comparator = async (
         },
       );
 
-      tracker.stopPolling(tickerMint);
+      tracker.stopPolling(userId, tickerMint);
       await db.deleteRequest(userId, tickerMint);
       await redis.clearCachedRequest(userId, tickerMint);
     }

@@ -1,20 +1,9 @@
 import { createClient, type RedisClientType } from "redis";
-import { config } from "./config.js";
+import { redisClientConfig } from "./config.js";
 
 class Cache {
   private static redisClient: RedisClientType<{}, {}, {}, 3, {}> = createClient(
-    {
-      url: config.redisConnectionString,
-      socket: {
-        reconnectStrategy: (retries) => {
-          if (retries > 10) {
-            return new Error("Max retry attempts has reached");
-          }
-
-          return Math.min(Math.pow(2, retries) * 50, 2000);
-        },
-      },
-    },
+    redisClientConfig,
   )
     .on("error", (err) => {
       console.log("[Redis Error]: ", err);
@@ -25,7 +14,7 @@ class Cache {
       return;
     });
 
-  public async init() {
+  public async init(): Promise<void> {
     try {
       await Cache.redisClient.connect();
     } catch (err) {
@@ -39,7 +28,7 @@ class Cache {
     decimals: number,
   ): Promise<void> {
     try {
-      // set the key only if it does not already exists and set 2 mins expiry
+      // set the mint-decimal key pair only if it does not already exists
       await Cache.redisClient.set(tickerMint, decimals, {
         condition: "NX",
       });
@@ -67,8 +56,7 @@ class Cache {
 
   public async clearDecimals(tickerMint: string): Promise<void> {
     try {
-      const res = await Cache.redisClient.del(tickerMint);
-      console.log("Cleared Decimals: ", res);
+      await Cache.redisClient.del(tickerMint);
     } catch (err) {
       console.error("[Redis Error]: ", err);
       return;
@@ -81,11 +69,10 @@ class Cache {
     threshold: number,
   ): Promise<void> {
     try {
-      const key = tickerMint;
-      const value = threshold;
-      const res = await Cache.redisClient.hSet(userId.toString(), key, value);
-      await Cache.redisClient.hExpire(userId.toString(), key, 60);
-      console.log(`Cached request: ${res}: ${key}-${value}`);
+      // cache request
+      await Cache.redisClient.hSet(userId.toString(), tickerMint, threshold);
+      // set expiry to cached req
+      await Cache.redisClient.hExpire(userId.toString(), tickerMint, 120);
     } catch (err) {
       console.error("[Redis Error]: ", err);
       return;
@@ -97,8 +84,10 @@ class Cache {
     tickerMint: string,
   ): Promise<number | null | undefined> {
     try {
-      const key = tickerMint;
-      const threshold = await Cache.redisClient.hGet(userId.toString(), key);
+      const threshold = await Cache.redisClient.hGet(
+        userId.toString(),
+        tickerMint,
+      );
       if (threshold) {
         console.log("Cache Hit!");
         return Number(threshold);
@@ -117,9 +106,8 @@ class Cache {
     tickerMint: string,
   ): Promise<void> {
     try {
-      const key = tickerMint;
-      const res = await Cache.redisClient.hDel(userId.toString(), key);
-      console.log(res);
+      // delete cached req
+      await Cache.redisClient.hDel(userId.toString(), tickerMint);
     } catch (err) {
       console.error("[Redis Error]: ", err);
       return;

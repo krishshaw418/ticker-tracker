@@ -4,18 +4,19 @@ import {
   createConversation,
   type ConversationFlavor,
 } from "@grammyjs/conversations";
-import { config } from "../lib/config.js";
+import { envConfig } from "../lib/config.js";
 import { trackAssetHandler } from "./handlers.js";
 
-const bot = new Bot<ConversationFlavor<Context>>(config.botApiKey);
+const bot = new Bot<ConversationFlavor<Context>>(envConfig.botApiKey);
+
 bot.use(
   conversations({
     // log enter & exit events for conversations for debugging.
-    onEnter(convoName, ctx) {
-      console.log(`Entered convo id: ${convoName}`);
+    onEnter(convoName, _ctx) {
+      console.log(`Entered convo: ${convoName}`);
     },
-    onExit(convoName, ctx) {
-      console.log(`Exit convo id: ${convoName}`);
+    onExit(convoName, _ctx) {
+      console.log(`Exit convo: ${convoName}`);
     },
   }),
 ); // using the conversation middleware
@@ -52,4 +53,4 @@ bot.catch((err) => {
   }
 });
 
-export default bot;
+export { bot };

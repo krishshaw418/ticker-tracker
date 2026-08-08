@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const configSchema = z.object({
+export const envConfigSchema = z.object({
   PORT: z.coerce.number(),
   TG_BOT_API_KEY: z.string(),
   JUPITER_API_KEY: z.string(),
