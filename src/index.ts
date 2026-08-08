@@ -1,6 +1,6 @@
-import { createServer } from "./lib/server";
-import bot from "./bot/bot";
-import { config } from "./lib/config";
+import { createServer } from "./lib/server.js";
+import bot from "./bot/bot.js";
+import { config } from "./lib/config.js";
 
 async function main(): Promise<void> {
   const app = await createServer();

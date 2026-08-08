@@ -1,7 +1,7 @@
 import type { Context } from "grammy";
 import type { Conversation } from "@grammyjs/conversations";
-import { trackTicker } from "../services/trackTicker";
-import { tickerInfo } from "../lib/tickerInfo";
+import { trackTicker } from "../services/trackTicker.js";
+import { tickerInfo } from "../lib/tickerInfo.js";
 
 export const trackAssetHandler = async (
   conversation: Conversation,
@@ -59,19 +59,27 @@ export const trackAssetHandler = async (
   } catch (err) {
     console.error(err);
     if (err instanceof Error && err.message === "Invalid Mint") {
-      ctx.reply("Invalid mint address! Please check the address and retry.");
+      ctx.reply(
+        "<b>Invalid mint address!</b>\nPlease check the address and retry.",
+        { parse_mode: "HTML" },
+      );
     }
     if (err instanceof Error && err.message === "Parsing Error") {
-      ctx.reply("Invalid price entered!\nTap /trackasset to try again.");
+      ctx.reply(
+        "<b>Invalid price entered!</b>\nTap /trackasset to try again.",
+        { parse_mode: "HTML" },
+      );
     }
     if (err instanceof Error && err.message === "DB Error") {
       ctx.reply(
-        "Something went wrong on our end!\nPlease try again after sometime.",
+        "<b>Same request already exist!</b>\nPlease try again with a different request.",
+        { parse_mode: "HTML" },
       );
     }
     if (err instanceof Error && err.message === "Not Found") {
       ctx.reply(
-        "Account not found at the entered address!\nTap /trackasset to try again with a different address.",
+        "<b>Account not found at the entered address!</b>\nTap /trackasset to try again with a different address.",
+        { parse_mode: "HTML" },
       );
     }
     await conversation.halt();

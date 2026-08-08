@@ -1,8 +1,8 @@
 import { createSolanaRpc, type Address, isAddress } from "@solana/kit";
 import { fetchMint } from "@solana-program/token";
 import { fetchMint as fetchMint2022 } from "@solana-program/token-2022";
-import { config } from "./config";
-import { redis } from "./redis";
+import { config } from "./config.js";
+import { redis } from "./redis.js";
 import { SolanaError } from "@solana/kit";
 
 class TickerInfo {

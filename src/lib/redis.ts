@@ -1,5 +1,5 @@
 import { createClient, type RedisClientType } from "redis";
-import { config } from "./config";
+import { config } from "./config.js";
 
 class Cache {
   private static redisClient: RedisClientType<{}, {}, {}, 3, {}> = createClient(

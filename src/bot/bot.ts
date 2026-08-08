@@ -4,8 +4,8 @@ import {
   createConversation,
   type ConversationFlavor,
 } from "@grammyjs/conversations";
-import { config } from "../lib/config";
-import { trackAssetHandler } from "./handlers";
+import { config } from "../lib/config.js";
+import { trackAssetHandler } from "./handlers.js";
 
 const bot = new Bot<ConversationFlavor<Context>>(config.botApiKey);
 bot.use(
@@ -37,7 +37,7 @@ bot.command("help", async (ctx) => {
     "<b>Available Options</b>:\n/start - Introduction\n/trackasset - Track a ticker on Solana",
     { parse_mode: "HTML" },
   );
-})
+});
 
 bot.catch((err) => {
   const ctx = err.ctx;

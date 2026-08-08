@@ -1,6 +1,6 @@
-import { config } from "./config";
-import { comparator } from "../utils/comparator";
-import { redis } from "./redis";
+import { config } from "./config.js";
+import { comparator } from "../utils/comparator.js";
+import { redis } from "./redis.js";
 
 class Tracker {
   private static pollIntervals: Map<string, NodeJS.Timeout> = new Map<
@@ -36,7 +36,10 @@ class Tracker {
             },
           );
 
-          const data = await response.json();
+          const data = (await response.json()) as {
+            inAmount: number;
+            outAmount: number;
+          };
 
           // calculate price in USDC
           const currPrice =

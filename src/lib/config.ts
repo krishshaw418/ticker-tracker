@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { configSchema } from "../schemas/configSchema";
+import { configSchema } from "../schemas/configSchema.js";
 
 const envVariables = configSchema.parse(process.env);
 

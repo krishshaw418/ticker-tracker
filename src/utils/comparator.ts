@@ -1,7 +1,7 @@
-import bot from "../bot/bot";
-import { tracker } from "../lib/tracker";
-import { db } from "../lib/db";
-import { redis } from "../lib/redis";
+import bot from "../bot/bot.js";
+import { tracker } from "../lib/tracker.js";
+import { db } from "../lib/db.js";
+import { redis } from "../lib/redis.js";
 
 export const comparator = async (
   userId: number,

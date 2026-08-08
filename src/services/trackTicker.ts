@@ -1,6 +1,6 @@
-import { tracker } from "../lib/tracker";
-import { redis } from "../lib/redis";
-import { db } from "../lib/db";
+import { tracker } from "../lib/tracker.js";
+import { redis } from "../lib/redis.js";
+import { db } from "../lib/db.js";
 
 export const trackTicker = async (
   userId: number,
@@ -17,7 +17,8 @@ export const trackTicker = async (
     await redis.cacheRequest(userId, tickerMint, threshold);
   } catch (err) {
     throw new Error("DB Error", {
-      cause: "Something went wrong!",
+      cause:
+        "Duplicate key value violates unique constraint 'request_userid_tickermint_key'",
     });
   }
 };
